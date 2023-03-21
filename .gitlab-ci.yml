@@ -1,0 +1,81 @@
+# POSSIBLE GITLAB SETUP
+
+stages:
+  - build
+  - deploy
+  - test
+
+image:
+  name: dora_containernet
+
+variables:
+  CARGO_HOME: "/usr/local/cargo/bin"
+  PATH: "$CARGO_HOME/bin:$PATH"
+
+before_script:
+  - echo "Installing required dependencies...\n"
+  - sudo apt install -qqy \
+    ansible \
+    aptitude \
+    apt-transport-https \
+    build-essential \
+    ca-certificates \
+    curl \
+    git \
+    iptables \
+    libssl-dev \
+    python3-setuptools \
+    python3-dev \
+    python3-pip \
+    software-properties-common
+  - sudo ntpdate -u ca.pool.ntp.org
+
+Containernet Build:
+  stage: build
+  script:
+    - echo "Installing Containernet...\n"
+    - git clone https://github.com/containernet/containernet.git
+    - sudo ansible-playbook -i "localhost," -c local containernet/ansible/install.yml
+  tags:
+    - containernet
+
+Dora Build:
+  stage: build 
+  script:
+    - echo "Building Dora binary...\n"
+    - git clone "This will need to be my dora repo for now"
+    - sudo ansible-playbook -i "localhost," -c local dora/ansible/local.yml
+  tags:
+    - dora
+
+Build Docker images:
+  stage: build
+  script:
+    - echo "Building Docker images...\n"
+    - containernet/examples/example-containers/build.sh
+    - sudo docker build -f dora/Dockerfile -t dora .
+  dependencies:
+    - "Dora Build"
+    - "Containernet Build"
+
+Start Containernet:
+    stage: deploy
+    script:
+        - echo "Starting Containernet...\n"
+        - mkdir containernet/config
+        - mv test.py containernet/config/test.py
+        - sudo python3 containernet/config/test.py
+    dependencies:
+      - "Build Docker images"
+    tags:
+        - containernet
+
+Start Dora:
+    stage: deploy
+    script:
+        - echo "Starting Dora on container "mn.d1"
+        - sudo docker exec mn.d1 mkdir /var/lib/dora
+        - sudo docker exec mn.d1 mv dora/config/test.yml /var/lib/dora
+        - sudo docker exec mn.d1 DORA_LOG="debug" dora/target/debug/dora -c dora/config/test.yaml -d dora/h1.db
+    tags:
+    - dora

@@ -1,0 +1,61 @@
+- name: Install Rust, SQLX, and Dora
+  hosts: localhost
+  become: yes
+
+  vars:
+    dora_dir: "{{ ansible_user_dir }}/dora"
+
+  tasks:
+    - name: Update package cache
+      apt:
+        update_cache: yes
+
+    - name: Check if Cargo is installed
+      command: which cargo
+      register: cargo_installed
+      failed_when: cargo_installed.rc != 0
+
+    - name: Download Rustup installer
+      get_url:
+        url: https://sh.rustup.rs
+        dest: /tmp/sh.rustup.rs
+        mode: "0755"
+        force: yes
+      when: cargo_installed.rc != 0
+
+    - name: Install Rust/Cargo
+      command: /tmp/sh.rustup.rs -y
+      when: cargo_installed.rc != 0
+
+    - name: Check if SQLX-CLI is installed
+      command: sqlx -V
+      register: sqlx_installed
+      failed_when: sqlx_installed.rc != 0
+      when: cargo_installed.rc == 0
+
+    - name: Install SQLX-CLI
+      command: cargo install sqlx-cli
+      when: sqlx_installed.rc != 0
+
+    - name: Create database
+      command: sqlx database create
+      args:
+        chdir: "{{ dora_dir }}"
+      when: sqlx_installed.rc != 0
+
+    - name: Migrate database
+      command: sqlx migrate run
+      args:
+        chdir: "{{ dora_dir }}"
+      when: sqlx_installed.rc != 0
+
+    - name: Install Dora binary
+      command: cargo build
+      args:
+        chdir: "{{ dora_dir }}"
+      when: sqlx_installed.rc == 0
+
+    - name: Check if Dora installed properly
+      command: ls target/debug
+      args:
+        chdir: "{{ dora_dir }}"

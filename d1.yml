@@ -1,0 +1,30 @@
+# /home/dwood/dora/
+
+# chaddr_only: false
+interfaces:
+  - d1-eth0
+networks:
+    10.0.0.1/8:
+        authoritative: true
+        # ping_check: false
+        # ping_timeout_ms: 500
+        probation_period: 86400
+        # (optional)
+        # server_id: 10.0.0.1
+        ranges:
+            -
+                start: 10.0.0.10
+                end: 10.0.0.100
+                config:
+                    lease_time:
+                        default: 3600
+                options:
+                    values:
+                        3: # router (required)
+                            type: ip_list
+                            value:
+                                - 10.0.0.1
+                        6: # domain name required (if running a DNS server like dnsmasq also, use it's IP)
+                            type: ip_list
+                            value:
+                                - 8.8.8.8
