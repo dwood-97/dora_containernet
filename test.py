@@ -13,9 +13,8 @@ info('*** Adding controller\n')
 net.addController('c0')
 
 info('*** Adding docker containers\n')
-d1 = net.addDocker('d1', ip='10.0.0.1', dimage="dora",
-                   volumes=["/home/dwood/dora:/dora"])
-d2 = net.addDocker('d2', ip='10.0.0.3', dimage="dora")
+d1 = net.addDocker('d1', ip='10.0.0.1', dimage="ubuntu2004", volumes=["$HOME/dora:/dora"])
+d2 = net.addDocker('d2', ip='10.0.0.3', dimage="ubuntu2004")
 
 info('*** Adding switches\n')
 s1 = net.addSwitch('s1')

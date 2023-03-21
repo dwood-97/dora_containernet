@@ -5,9 +5,6 @@ stages:
   - deploy
   - test
 
-image:
-  name: dora_containernet
-
 variables:
   CARGO_HOME: "/usr/local/cargo/bin"
   PATH: "$CARGO_HOME/bin:$PATH"
@@ -43,8 +40,10 @@ Dora Build:
   stage: build 
   script:
     - echo "Building Dora binary...\n"
-    - git clone "This will need to be my dora repo for now"
-    - sudo ansible-playbook -i "localhost," -c local dora/ansible/local.yml
+    - git clone https://github.com/bluecatengineering/dora
+    - mkdir dora/ansible
+    - mv $HOME/dora_install,yml $HOME/dora/ansible/dora_install.yml
+    - sudo ansible-playbook -i "localhost," -c local dora/ansible/dora_install.yml
   tags:
     - dora
 
@@ -53,11 +52,11 @@ Build Docker images:
   script:
     - echo "Building Docker images...\n"
     - containernet/examples/example-containers/build.sh
-    - sudo docker build -f dora/Dockerfile -t dora .
   dependencies:
     - "Dora Build"
     - "Containernet Build"
 
+# Containernet runner will hold containernet CLI open
 Start Containernet:
     stage: deploy
     script:
@@ -79,3 +78,4 @@ Start Dora:
         - sudo docker exec mn.d1 DORA_LOG="debug" dora/target/debug/dora -c dora/config/test.yaml -d dora/h1.db
     tags:
     - dora
+
