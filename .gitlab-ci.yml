@@ -1,8 +1,8 @@
 # POSSIBLE GITLAB SETUP
 
 before_script:
-  - apt update -qq
-  - apt upgrade -yqq
+  - apt-get update -qq
+  - apt-get upgrade -yqq
   - apt install -yqq \
       ansible \
       aptitude \
