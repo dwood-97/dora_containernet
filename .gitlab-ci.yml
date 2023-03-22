@@ -1,10 +1,5 @@
 # POSSIBLE GITLAB SETUP
 
-stages:
-  - build
-  - deploy
-  - test
-
 variables:
   BEFORE_SCRIPT: |
     DEBIAN_FRONTEND=noninteractive apt-get -qq update && \
@@ -23,6 +18,11 @@ variables:
       python3-pip \
       software-properties-common
     sudo ntpdate -u ca.pool.ntp.org
+
+stages:
+  - build
+  - deploy
+  - test
 
 Containernet Build:
   stage: build
