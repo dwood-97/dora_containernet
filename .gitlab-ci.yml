@@ -1,5 +1,13 @@
 # POSSIBLE GITLAB SETUP
 
+stages:
+  - build
+  - deploy
+  - test
+
+image: 
+  - arm64v8/ubuntu:focal-20230126
+
 before_script:
   - ln -sf /usr/share/zoneinfo/UTC /etc/localtime
   - apt-get update && apt-get upgrade -y
@@ -18,11 +26,6 @@ before_script:
     python3-dev \
     python3-pip \
     software-properties-common
-
-stages:
-  - build
-  - deploy
-  - test
 
 Containernet Build:
   stage: build
