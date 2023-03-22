@@ -1,8 +1,8 @@
 # POSSIBLE GITLAB SETUP
 
 before_script:
-  - DEBIAN_FRONTEND=noninteractive apt-get -qq update && \
-    DEBIAN_FRONTEND=noninteractive apt-get -qq install \
+  - apt-get -qq update && \
+    apt-get -qq install -y \
       ansible \
       aptitude \
       apt-transport-https \
