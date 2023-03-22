@@ -1,8 +1,9 @@
 # POSSIBLE GITLAB SETUP
 
 before_script:
-  - apt update && \
-    apt install -y \
+  - apt update
+  - apt upgrade -y
+  - apt install -y \
       ansible \
       aptitude \
       apt-transport-https \
