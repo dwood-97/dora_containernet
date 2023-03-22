@@ -11,6 +11,7 @@ stages:
 
 before_script:
   - echo "Installing required dependencies...\n"
+  - apt update -qqy
   - apt install -qqy \
     ansible \
     aptitude \
