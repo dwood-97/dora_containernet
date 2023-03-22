@@ -5,9 +5,9 @@ stages:
   - deploy
   - test
 
-variables:
-  CARGO_HOME: "/usr/local/cargo/bin"
-  PATH: "$CARGO_HOME/bin:$PATH"
+# variables:
+#   CARGO_HOME: "/usr/local/cargo/bin"
+#   PATH: "$CARGO_HOME/bin:$PATH"
 
 before_script:
   - echo "Installing required dependencies...\n"
