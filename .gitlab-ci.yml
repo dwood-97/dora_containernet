@@ -33,6 +33,8 @@ Containernet Build:
     - echo "Installing Containernet...\n"
     - git clone https://github.com/containernet/containernet.git
     - sudo ansible-playbook -i "localhost," -c local containernet/ansible/install.yml
+  dependencies:
+    - "Build Docker images"
   tags:
     - containernet
 
@@ -44,6 +46,8 @@ Dora Build:
     - mkdir dora/ansible
     - mv $HOME/dora_install,yml $HOME/dora/ansible/dora_install.yml
     - sudo ansible-playbook -i "localhost," -c local dora/ansible/dora_install.yml
+  dependencies:
+    - "Build Docker images"
   tags:
     - dora
 
@@ -52,9 +56,6 @@ Build Docker images:
   script:
     - echo "Building Docker images...\n"
     - containernet/examples/example-containers/build.sh
-  dependencies:
-    - "Dora Build"
-    - "Containernet Build"
 
 # Containernet runner will hold containernet CLI open
 Start Containernet:
