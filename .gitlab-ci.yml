@@ -26,6 +26,8 @@ variables:
 
 Containernet Build:
   stage: build
+  variables:
+    BEFORE_SCRIPT: $BEFORE_SCRIPT
   script:
     - echo "Installing Containernet...\n"
     - $BEFORE_SCRIPT
@@ -38,6 +40,8 @@ Containernet Build:
 
 Dora Build:
   stage: build 
+  variables:
+    BEFORE_SCRIPT: $BEFORE_SCRIPT
   script:
     - echo "Building Dora binary...\n"
     - $BEFORE_SCRIPT
@@ -52,31 +56,37 @@ Dora Build:
 
 Build Docker images:
   stage: build
+  variables:
+    BEFORE_SCRIPT: $BEFORE_SCRIPT
   script:
     - echo "Building Docker images...\n"
     - containernet/examples/example-containers/build.sh
 
 # Containernet runner will hold containernet CLI open
 Start Containernet:
-    stage: deploy
-    script:
-        - echo "Starting Containernet...\n"
-        - $BEFORE_SCRIPT
-        - mkdir containernet/config
-        - mv test.py containernet/config/test.py
-        - sudo python3 containernet/config/test.py
-    dependencies:
-      - "Build Docker images"
-    tags:
-        - containernet
+  stage: deploy
+  variables:
+    BEFORE_SCRIPT: $BEFORE_SCRIPT
+  script:
+    - echo "Starting Containernet...\n"
+    - $BEFORE_SCRIPT
+    - mkdir containernet/config
+    - mv test.py containernet/config/test.py
+    - sudo python3 containernet/config/test.py
+  dependencies:
+    - "Build Docker images"
+  tags:
+    - containernet
 
 Start Dora:
-    stage: deploy
-    script:
-        - echo "Starting Dora on container "mn.d1""
-        - sudo docker exec mn.d1 mkdir /var/lib/dora
-        - sudo docker exec mn.d1 mv dora/config/test.yml /var/lib/dora
-        - sudo docker exec mn.d1 DORA_LOG="debug" dora/target/debug/dora -c dora/config/test.yaml -d dora/h1.db
-    tags:
+  stage: deploy
+  variables:
+    BEFORE_SCRIPT: $BEFORE_SCRIPT
+  script:
+    - echo "Starting Dora on container "mn.d1""
+    - sudo docker exec mn.d1 mkdir /var/lib/dora
+    - sudo docker exec mn.d1 mv dora/config/test.yml /var/lib/dora
+    - sudo docker exec mn.d1 DORA_LOG="debug" dora/target/debug/dora -c dora/config/test.yaml -d dora/h1.db
+  tags:
     - dora
 
