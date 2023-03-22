@@ -5,33 +5,11 @@ stages:
   - deploy
   - test
 
-# variables:
-#   CARGO_HOME: "/usr/local/cargo/bin"
-#   PATH: "$CARGO_HOME/bin:$PATH"
-
-before_script:
-  - echo "Installing required dependencies...\n"
-  - apt update -y
-  - apt install -qqy \
-    ansible \
-    aptitude \
-    apt-transport-https \
-    build-essential \
-    ca-certificates \
-    curl \
-    git \
-    iptables \
-    libssl-dev \
-    python3-setuptools \
-    python3-dev \
-    python3-pip \
-    software-properties-common
-  - sudo ntpdate -u ca.pool.ntp.org
-
 Containernet Build:
   stage: build
   script:
     - echo "Installing Containernet...\n"
+    - $BEFORE_SCRIPT
     - git clone https://github.com/containernet/containernet.git
     - sudo ansible-playbook -i "localhost," -c local containernet/ansible/install.yml
   dependencies:
@@ -43,6 +21,7 @@ Dora Build:
   stage: build 
   script:
     - echo "Building Dora binary...\n"
+    - $BEFORE_SCRIPT
     - git clone https://github.com/bluecatengineering/dora
     - mkdir dora/ansible
     - mv $HOME/dora_install,yml $HOME/dora/ansible/dora_install.yml
@@ -63,6 +42,7 @@ Start Containernet:
     stage: deploy
     script:
         - echo "Starting Containernet...\n"
+        - $BEFORE_SCRIPT
         - mkdir containernet/config
         - mv test.py containernet/config/test.py
         - sudo python3 containernet/config/test.py
