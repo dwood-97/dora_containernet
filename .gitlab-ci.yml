@@ -1,12 +1,13 @@
 # POSSIBLE GITLAB SETUP
 
 before_script:
-  - apt-get update -qq
+  - apt-get update -qq && apt-get install apt-utils
   - apt-get upgrade -yqq
-  - apt install -yqq \
+  - apt-get install -yqq \
       ansible \
       aptitude \
       apt-transport-https \
+      
       build-essential \
       ca-certificates \
       curl \
