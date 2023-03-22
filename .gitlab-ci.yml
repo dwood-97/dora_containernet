@@ -54,7 +54,7 @@ Start Containernet:
 Start Dora:
     stage: deploy
     script:
-        - echo "Starting Dora on container "mn.d1"
+        - echo "Starting Dora on container "mn.d1""
         - sudo docker exec mn.d1 mkdir /var/lib/dora
         - sudo docker exec mn.d1 mv dora/config/test.yml /var/lib/dora
         - sudo docker exec mn.d1 DORA_LOG="debug" dora/target/debug/dora -c dora/config/test.yaml -d dora/h1.db
