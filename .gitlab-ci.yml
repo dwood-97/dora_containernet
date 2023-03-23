@@ -2,6 +2,7 @@
 
 stages:
   - build
+  - post_build
   - deploy
   - test
 
@@ -23,28 +24,14 @@ before_script:
   - apt-get install python3-dev -y
   - apt-get install python3-pip -y
   - apt-get install software-properties-common -y
- 
-    # aptitude \
-    # apt-transport-https \
-    # build-essential \
-    # ca-certificates \
-    # curl \
-    # git \
-    # iptables \
-    # libssl-dev \
-    # python3-setuptools \
-    # python3-dev \
-    # python3-pip \
-    # software-properties-common
+  - git clone https://gitlab.com/dwood-97/dora_containernet.git
 
 Containernet Build:
   stage: build
   script:
     - echo "Installing Containernet...\n"
     - git clone https://github.com/containernet/containernet.git
-    - sudo ansible-playbook -i "localhost," -c local containernet/ansible/install.yml
-  dependencies:
-    - "Build Docker images"
+    - ansible-playbook -i "localhost," -c local containernet/ansible/install.yml
   tags:
     - containernet
 
@@ -55,14 +42,12 @@ Dora Build:
     - git clone https://github.com/bluecatengineering/dora
     - mkdir dora/ansible
     - mv $HOME/dora_install.yml $HOME/dora/ansible/dora_install.yml
-    - sudo ansible-playbook -i "localhost," -c local dora/ansible/dora_install.yml
-  dependencies:
-    - "Build Docker images"
+    - ansible-playbook -i "localhost," -c local dora/ansible/dora_install.yml
   tags:
     - dora
 
 Build Docker images:
-  stage: build
+  stage: post_build
   script:
     - echo "Building Docker images...\n"
     - containernet/examples/example-containers/build.sh
@@ -74,7 +59,7 @@ Start Containernet:
     - echo "Starting Containernet...\n"
     - mkdir containernet/config
     - mv test.py containernet/config/test.py
-    - sudo python3 containernet/config/test.py
+    - python3 containernet/config/test.py
   dependencies:
     - "Build Docker images"
   tags:
@@ -84,8 +69,8 @@ Start Dora:
   stage: deploy
   script:
     - echo "Starting Dora on container "mn.d1""
-    - sudo docker exec mn.d1 mkdir /var/lib/dora
-    - sudo docker exec mn.d1 mv dora/config/test.yml /var/lib/dora
-    - sudo docker exec mn.d1 DORA_LOG="debug" dora/target/debug/dora -c dora/config/test.yaml -d dora/h1.db
+    - docker exec mn.d1 mkdir /var/lib/dora
+    - docker exec mn.d1 mv dora/config/test.yml /var/lib/dora
+    - docker exec mn.d1 DORA_LOG="debug" dora/target/debug/dora -c dora/config/test.yaml -d dora/h1.db
   tags:
     - dora
