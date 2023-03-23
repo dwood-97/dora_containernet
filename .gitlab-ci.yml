@@ -25,6 +25,7 @@ before_script:
   - apt-get install python3-dev -y
   - apt-get install python3-pip -y
   - apt-get install software-properties-common -y
+  - apt-get install sudo -y
   - git clone https://gitlab.com/dwood-97/dora_containernet.git
 
 Containernet Build:
