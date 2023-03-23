@@ -11,7 +11,7 @@ before_script:
   - ln -sf /usr/share/zoneinfo/UTC /etc/localtime
   - apt-get update && apt-get upgrade -y
   - apt-get install apt-utils -y
-  - apt-get installn ansible -y
+  - apt-get install ansible -y
  
     # aptitude \
     # apt-transport-https \
