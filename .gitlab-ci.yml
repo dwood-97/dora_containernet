@@ -5,8 +5,7 @@ stages:
   - deploy
   - test
 
-image: 
-  - "arm64v8/ubuntu:focal-20230126"
+image: arm64v8/ubuntu:focal-20230126
 
 before_script:
   - ln -sf /usr/share/zoneinfo/UTC /etc/localtime
