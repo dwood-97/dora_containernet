@@ -10,21 +10,21 @@ image: arm64v8/ubuntu:focal-20230126
 before_script:
   - ln -sf /usr/share/zoneinfo/UTC /etc/localtime
   - apt-get update && apt-get upgrade -y
-  - apt-get install -y apt-utils
-  - apt-get install -y \
-    ansible \
-    aptitude \
-    apt-transport-https \
-    build-essential \
-    ca-certificates \
-    curl \
-    git \
-    iptables \
-    libssl-dev \
-    python3-setuptools \
-    python3-dev \
-    python3-pip \
-    software-properties-common
+  - apt-get install apt-utils -y
+  - apt-get installn ansible -y
+ 
+    # aptitude \
+    # apt-transport-https \
+    # build-essential \
+    # ca-certificates \
+    # curl \
+    # git \
+    # iptables \
+    # libssl-dev \
+    # python3-setuptools \
+    # python3-dev \
+    # python3-pip \
+    # software-properties-common
 
 Containernet Build:
   stage: build
