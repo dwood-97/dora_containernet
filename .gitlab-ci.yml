@@ -9,24 +9,7 @@ stages:
 image: arm64v8/ubuntu:focal-20230126
 
 before_script:
-  - ln -sf /usr/share/zoneinfo/UTC /etc/localtime
-  - apt-get update && apt-get upgrade -y
-  - apt-get install apt-utils -y
-  - apt-get install ansible -y
-  - apt-get install aptitude -y
-  - apt-get install apt-transport-https -y
-  - apt-get install build-essential -y
-  - apt-get install ca-certificates -y
-  - apt-get install curl -y
-  - apt-get install git -y
-  - apt-get install iptables -y
-  - apt-get install libssl-dev -y
-  - apt-get install python3-setuptools -y
-  - apt-get install python3-dev -y
-  - apt-get install python3-pip -y
-  - apt-get install software-properties-common -y
-  - apt-get install sudo -y
-  - git clone https://gitlab.com/dwood-97/dora_containernet.git
+  - $BEFORE_SCRIPT
 
 Containernet Build:
   stage: build
@@ -41,10 +24,9 @@ Dora Build:
   stage: build 
   script:
     - echo "Building Dora binary...\n"
-    - git clone https://github.com/bluecatengineering/dora
-    - mkdir dora/ansible
-    - mv $HOME/dora_install.yml $HOME/dora/ansible/dora_install.yml
-    - ansible-playbook -i "localhost," -c local dora/ansible/dora_install.yml
+    - git clone https://gitlab.com/dwood-97/dora_containernet.git
+    - bash /dora_containernet/dora_boot.bash
+    - PATH="$HOME"/dora/target/debug:$PATH
   tags:
     - dora
 

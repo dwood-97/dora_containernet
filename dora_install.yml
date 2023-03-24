@@ -5,6 +5,11 @@
   vars:
     dora_dir: "{{ ansible_user_dir }}/dora"
 
+  # vars:
+  #   dora_dir: "{{ ansible_user_dir }}/dora"
+  #   cargo_home: "/usr/local/cargo"
+  #   path: "{{ ansible_env.PATH }}:{{ cargo_home }}/bin"
+
   tasks:
     - name: Update package cache
       apt:
@@ -13,7 +18,7 @@
     - name: Check if Cargo is installed
       command: which cargo
       register: cargo_installed
-      failed_when: cargo_installed.rc != 0
+      ignore_errors: true
 
     - name: Download Rustup installer
       get_url:
@@ -26,16 +31,18 @@
     - name: Install Rust/Cargo
       command: /tmp/sh.rustup.rs -y
       when: cargo_installed.rc != 0
+      environment:
+        CARGO_HOME: "/usr/local/cargo"
+        PATH: "/usr/local/cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
-    - name: Check if SQLX-CLI is installed
-      command: sqlx -V
-      register: sqlx_installed
-      failed_when: sqlx_installed.rc != 0
-      when: cargo_installed.rc == 0
 
     - name: Install SQLX-CLI
-      command: cargo install sqlx-cli
-      when: sqlx_installed.rc != 0
+      command: cargo install sql
+
+    - name: Check if SQLX is installed
+      command: which sqlx
+      register: sqlx_installed
+      ignore_errors: true
 
     - name: Create database
       command: sqlx database create
