@@ -10,7 +10,7 @@ done
 
 # Install Dependencies
 echo -e "\nUpdating system packages..."
-if ! ( apt update && apt upgrade -qqy );
+if ! ( apt update -qq && apt upgrade -qqy );
 then
     { echo -e "\nBuild failed at: Updating system packages..."; exit 1; }
 fi

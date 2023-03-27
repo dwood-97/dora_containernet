@@ -14,9 +14,7 @@ before_script:
 Containernet Build:
   stage: build
   script:
-    - echo "Installing Containernet...\n"
-    - git clone https://github.com/containernet/containernet.git
-    - ansible-playbook -i "localhost," -c local containernet/ansible/install.yml
+    - 
   tags:
     - containernet
 
@@ -40,7 +38,7 @@ Build Docker images:
 Start Containernet:
   stage: deploy
   script:
-    - echo "Starting Containernet...\n"
+    - 
     - mkdir containernet/config
     - mv test.py containernet/config/test.py
     - python3 containernet/config/test.py
