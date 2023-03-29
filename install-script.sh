@@ -10,23 +10,6 @@ PATH=$CARGO_HOME/bin:$PATH
 $HOME=$CI_BUILD_DIR
 cd $HOME
 
-# Wait for lock file to become available
-# while sudo fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1 ; do
-#     echo "Waiting for dpkg lock file to become available..."
-#     sleep 1
-# done
-
-# Update system clock
-# echo "Installing NTP..."
-# if ! sudo apt install ntpdate -qqy;
-# then
-#     { echo -e "\nBuild failed at: Installing NTP..."; exit 1; }
-# fi
-# echo -e "\nUpdating system clock..."
-# if ! sudo ntpdate -u ca.pool.ntp.org;
-# then
-#     { echo -e "\nBuild failed at: Updating system clock..."; exit 1; }
-# fi
 echo -e "\nUpdating system packages..."
 if ! (sudo apt update && sudo apt upgrade -qqy);
 then
@@ -50,11 +33,11 @@ if ! curl https://sh.rustup.rs -sSf | sh -s -- -y;
 then
     { echo -e "\nBuild failed at: Installing Rust..."; exit 1; }
 fi
+
 # Activate Rust environment
 # shellcheck source=/dev/null
 source "$HOME"/.cargo/env
-ls -a
-pwd
+
 # Clone Dora 
 echo -e "\nCloning Dora repository..."
 if ! git clone https://github.com/bluecatengineering/dora $HOME/dora;
@@ -68,11 +51,13 @@ if ! cargo install sqlx-cli;
 then
     { echo -e "\nBuild failed at: Installing SQLx CLI..."; exit 1; }
 fi
+
 echo -e "\nCreating SQLx database..."
 if ! (cd "$HOME"/dora && sqlx database create);
 then
     { echo -e "\nBuild failed at: Creating SQLx database..."; exit 1; }
 fi
+
 echo -e "\nRunning SQLx migrations..."
 if ! (cd "$HOME"/dora && sqlx migrate run);
 then
@@ -85,6 +70,7 @@ if ! (cd "$HOME"/dora && cargo build);
 then
     { echo -e "\nBuild failed at: Building Dora..."; exit 1; }
 fi
+
 PATH="$HOME"/dora/target/debug:$PATH
 
 # Clone & install Containernet
@@ -94,10 +80,18 @@ then
     { echo -e "\nBuild failed at: Cloning Containernet repository..."; exit 1; }
 fi
 echo -e "\nInstalling Containernet..."
-if ! ansible-playbook -i "localhost," -c local $HOME/containernet/ansible/install.yml;
-then
+for i in {1..5}; do
+    if ansible-playbook -i "localhost," -c local $HOME/containernet/ansible/install.yml; then
+        break
+    else
+        echo -e "\nFailed to install Containernet. Retrying in 30 seconds..."
+        sleep 5
+    fi
+done
+if [ $i -eq 5 ]; then
     { echo -e "\nBuild failed at: Installing Containernet..."; exit 1; }
 fi
+
 
 ###############################
 # Starting up Containernet/Dora
