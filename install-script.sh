@@ -52,7 +52,8 @@ fi
 # shellcheck source=/dev/null
 source "$HOME"/.cargo/env
 ls -a
-# Clone Dora
+pwd
+# Clone Dora 
 echo -e "\nCloning Dora repository..."
 if ! git clone https://github.com/bluecatengineering/dora;
 then
