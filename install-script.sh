@@ -53,7 +53,7 @@ fi
 source "$HOME"/.cargo/env
 ls -a
 pwd
-# Clone Dora
+# Clone Dora 
 echo -e "\nCloning Dora repository..."
 if ! git clone https://github.com/bluecatengineering/dora;
 then
