@@ -51,7 +51,7 @@ fi
 # Activate Rust environment
 # shellcheck source=/dev/null
 source "$HOME"/.cargo/env
-
+ls -a
 # Clone Dora
 echo -e "\nCloning Dora repository..."
 if ! git clone https://github.com/bluecatengineering/dora;
