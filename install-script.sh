@@ -4,11 +4,17 @@
 # Install Dora & Containernet on VM
 ###################################
 
-# Define variables
+Define variables
 CARGO_HOME=/usr/local/cargo
 PATH=$CARGO_HOME/bin:$PATH
 $HOME=$CI_BUILD_DIR
 cd $HOME
+
+# Wait for lock file to become available
+while sudo fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1 ; do
+    echo "Waiting for dpkg lock file to become available..."
+    sleep 1
+done
 
 echo -e "\nUpdating system packages..."
 if ! (sudo apt update && sudo apt upgrade -qqy);
@@ -79,18 +85,25 @@ if ! git clone https://github.com/containernet/containernet.git $HOME/containern
 then
     { echo -e "\nBuild failed at: Cloning Containernet repository..."; exit 1; }
 fi
+
 echo -e "\nInstalling Containernet..."
-for i in {1..5}; do
-    if ansible-playbook -i "localhost," -c local $HOME/containernet/ansible/install.yml; then
-        break
-    else
-        echo -e "\nFailed to install Containernet. Retrying in 30 seconds..."
-        sleep 5
-    fi
-done
-if [ $i -eq 5 ]; then
-    { echo -e "\nBuild failed at: Installing Containernet..."; exit 1; }
+if ! (sudo ansible-playbook -i "localhost," -c local $HOME/containernet/ansible/install.yml); 
+then
+    { echo -e "\nFailed to install Containernet."; exit 1; }
 fi
+
+# echo -e "\nInstalling Containernet..."
+# for i in {1..5}; do
+#     if sudo ansible-playbook -i "localhost," -c local $HOME/containernet/ansible/install.yml; then
+#         break
+#     else
+#         echo -e "\nFailed to install Containernet. Retrying in 30 seconds..."
+#         sleep 5
+#     fi
+# done
+# if [ $i -eq 5 ]; then
+#     { echo -e "\nBuild failed at: Installing Containernet..."; exit 1; }
+# fi
 
 
 ###############################
