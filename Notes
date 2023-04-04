@@ -1,0 +1,71 @@
+Thoughts here are that this repo "dora_containernet" will contain the submodules for both containernet and dora. 
+The first part of this gitlab-ci.yml should include a pre_build stage so that if either "dora" or "containernet" 
+gets a push, the pipeline will be triggered. We run a git submodule update --init to get the latest updates on 
+both repos. Now we pass the Dockerfile for dora from "dora_containernet" into the "dora" repo submodule (since 
+dora does not currently have a Dockerfile), and initiate a docker build proccess for both containernet and dora 
+images. Once these builds are complete, we build a final image using COPY --from commands pulling from both the 
+dora and containernet images. This image will be called "test_image" which will run through the tests specified 
+in the pipelines and if the pipeline passes, it pushes "test_image" to the container registery tagging it 
+"dora_containernet:latest" and gives some sort of success message. 
+
+However if no changes have been made to either submodule "dora" or "containernet" but the pipeline is triggered, 
+it should skip the pre_build step, and just build the image that is already labled as "dora_containernet" in the 
+projects container registry, then run the tests, if all passes give some sort of success message.
+
+Here's an outline of how the pipeline might be structured:
+
+stages:
+  - pre_build
+  - build
+  - test
+  - deploy
+
+pre_build:
+  stage: pre_build
+  only:
+    changes:
+      - dora_containernet/*
+  script:
+    - git submodule update --init
+    - cp ./dora_containernet/Dockerfile ./dora/
+    - docker build -t containernet ./containernet/
+    - docker build -t dora ./dora/
+  
+build:
+  stage: build
+  except:
+    changes:
+      - dora_containernet/*
+  script:
+    - docker pull <your-registry>/<your-namespace>/dora_containernet:latest || true
+    - docker build -t containernet ./containernet/
+    - docker build -t dora ./dora/
+    - docker build --cache-from <your-registry>/<your-namespace>/dora_containernet:latest -t <your-registry>/<your-namespace>/dora_containernet:test -f ./dora_containernet/Dockerfile .
+
+test:
+  stage: test
+  script:
+    - docker run <your-registry>/<your-namespace>/dora_containernet:test <your-test-command>
+
+deploy:
+  stage: deploy
+  script:
+    - docker push <your-registry>/<your-namespace>/dora_containernet:test
+
+In this pipeline, there are four stages: pre_build, build, test, and deploy.
+
+The pre_build stage runs only if changes have been made to the dora_containernet directory. It initializes and 
+updates the submodules, copies the Dockerfile from dora_containernet to dora, and builds the containernet and 
+dora images.
+
+The build stage runs if changes have not been made to the dora_containernet directory. It pulls the latest 
+dora_containernet image from the registry (if it exists), builds the containernet and dora images, and then 
+builds the dora_containernet image using the Dockerfile in dora_containernet, pulling the cache from the latest 
+image in the registry.
+
+The test stage runs the tests on the dora_containernet image.
+
+The deploy stage pushes the dora_containernet image to the registry.
+
+This pipeline should accomplish the workflow you described. Note that you will need to replace <your-registry> and 
+<your-namespace> with the appropriate values for your registry.
