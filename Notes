@@ -95,4 +95,4 @@ Maybe look into how docker outputs the "hello world" message to user console. We
 docker run --name containernet -it --rm --privileged --pid='host' \
 -v /var/run/docker.sock:/var/run/docker.sock \
 -v /lib/modules:/lib/modules \
-containernet/containernet /bin/bash
+containernet/containernet /bin/bash 
