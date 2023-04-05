@@ -9,7 +9,7 @@
 #   - test
 #   - release
 #   - deploy
- 
+
 # variables:
 #   # Use TLS https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#tls-enabled
 #   DOCKER_HOST: tcp://docker:2376
@@ -23,7 +23,9 @@
 build_containernet:
   stage: build
   script:
-      - echo "test"
+    - echo "Deploying changes to GitLab..."
+    - export GITLAB_ACCESS_TOKEN=glpat-qp_MEfy7ycvXmiXg8y6_
+    - git push --set-upstream origin $CI_COMMIT_BRANCH
 #     - docker build --pull -t $CONTAINER_TEST_IMAGE .
 #     - docker push $CONTAINER_TEST_IMAGE
 
