@@ -24,7 +24,7 @@ build_containernet:
   stage: build
   script:
     - echo "Deploying changes to GitLab..."
-    - export GITLAB_ACCESS_TOKEN=$GITLAB_ACCESS_TOKEN
+    - export GITLAB_ACCESS_TOKEN=glpat-qp_MEfy7ycvXmiXg8y6_
     - git push --set-upstream origin $CI_COMMIT_BRANCH
 #     - docker build --pull -t $CONTAINER_TEST_IMAGE .
 #     - docker push $CONTAINER_TEST_IMAGE
