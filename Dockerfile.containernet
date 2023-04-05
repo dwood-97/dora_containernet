@@ -1,0 +1,39 @@
+FROM ubuntu:20.04
+
+# install required packages
+RUN apt-get clean
+RUN DEBIAN_FRONTEND=noninteractive apt-get -qq update && \
+    DEBIAN_FRONTEND=noninteractive apt-get -qq install \
+    ansible \
+    aptitude \
+    build-essential \
+    curl \
+    git \
+    iputils-ping \
+    iptables \
+    linux-image-5.15.0-69-generic \
+    net-tools \
+    python3-dev \
+    python3-pip \
+    python3-setuptools \
+    software-properties-common \
+    sudo
+
+# install containernet (using its Ansible playbook)
+COPY . /containernet
+COPY ./containernet_test.py ./containernet/examples/containerent_test.py
+COPY ./mininet_test.py ./containernet/examples/mininet_test.py
+WORKDIR /containernet/ansible
+RUN ansible-playbook -i "localhost," -c local --skip-tags "notindocker" install.yml
+WORKDIR /containernet
+RUN make develop
+
+# Hotfix: https://github.com/pytest-dev/pytest/issues/4770
+RUN pip3 install "more-itertools<=5.0.0"
+
+# tell containernet that it runs in a container
+ENV CONTAINERNET_NESTED 1
+
+# Important: This entrypoint is required to start the OVS service
+ENTRYPOINT ["util/docker/entrypoint.sh"]
+CMD ["python3", "examples/containernet_example.py"]

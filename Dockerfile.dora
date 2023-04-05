@@ -4,25 +4,15 @@ FROM ubuntu:20.04
 RUN apt-get clean
 RUN DEBIAN_FRONTEND=noninteractive apt-get -qq update && \
     DEBIAN_FRONTEND=noninteractive apt-get -qq install \
-    dnsutils \
-    tcpdump \
-    net-tools \
-    ifupdown \
-    hostapd \
-    bridge-utils \
-    iptables \
+    build-essential \
     curl \
-    iproute2 \
+    git \
     libssl-dev \
-    libdbus-1-dev \
-    libidn11-dev \
-    libnetfilter-conntrack-dev \
-    linux-image-5.15.0-69-generic \
-    netfilter-persistent \
-    nettle-dev
+    pkg-config
 
 # Copy the necessary files into the image
-COPY . /dora/
+COPY . /dora
+WORKDIR /dora
 
 # Set up environment variables
 ENV CARGO_HOME=/usr/local/cargo
@@ -35,10 +25,11 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y; \
     sqlx migrate run
 
 # Build the Dora binary and set it as the command to run when the container starts
-RUN cargo build --debug; \
+RUN cargo build; \
     cp target/debug/dora .; \
     chmod +x dora; \
-    mkdir /var/lib/dora; \
-    cp ../dora_cfg.yml /var/lib/dora/config.yaml
+    mkdir /var/lib/dora
+
+COPY ./dora_cfg.yml /var/lib/dora/config.yaml
 
 CMD ["./dora"]
