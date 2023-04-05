@@ -1,6 +1,0 @@
-[submodule "dora"]
-	path = dora
-	url = https://github.com/bluecatengineering/dora
-[submodule "containernet"]
-	path = containernet
-	url = https://github.com/containernet/containernet
