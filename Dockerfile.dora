@@ -11,7 +11,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -qq update && \
     pkg-config
 
 # Copy the necessary files into the image
-COPY . /dora
+COPY ./dora /dora
 WORKDIR /dora
 
 # Set up environment variables
